@@ -1,0 +1,11 @@
+﻿Name: EightSphere.BlackLists
+AntiForgery: enabled
+Author: 8th Sphere Inc
+Website: http://www.8sph.com
+Version: 1.0.0.0
+OrchardVersion: 1.9.2
+Description: Allows to block incoming request by IP or by referer. Can be helpful to prevent referer spam. 
+Features:
+    EightSphere.BlackLists:
+        Description: Blocks incoming request by IP or by referer.
+		Category: Security

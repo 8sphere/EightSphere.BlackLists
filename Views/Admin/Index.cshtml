@@ -1,0 +1,44 @@
+﻿@model EightSphere.BlackLists.ViewModel.BlacklistUpdateViewModel
+@{
+    Layout.Title = T("Black Lists Settings");
+}
+
+@using (Html.BeginFormAntiForgeryPost())
+{
+    @Html.ValidationSummary()
+    <fieldset>
+        <label>@T("IP Black List")</label>
+        @Html.TextAreaFor(m => m.IpBlackList, new {@class = "text small"})
+        <span class="hint">@T("Start each entry on a new line. Use * for wildcards. Ex: 192.168.1.*")</span>
+    </fieldset>
+    <fieldset>
+        <label>@T("IP White List")</label>
+        @Html.TextAreaFor(m => m.IpWhiteList, new {@class = "text small"})
+        <span class="hint">@T("Start each entry on a new line. Use * for wildcards. Ex: 192.168.1.*")</span>
+    </fieldset>
+
+    <fieldset>
+        <label>@T("Referer Black List")</label>
+        @Html.TextAreaFor(m => m.RefererBlackList, new { @class = "text small" })
+        <span class="hint">@T("Start each entry on a new line. Use * for wildcards. Ex: spam.*")</span>
+    </fieldset>
+    <fieldset>
+        <label>@T("Referer White List")</label>
+        @Html.TextAreaFor(m => m.RefererWhiteList, new {@class = "text small"})
+        <span class="hint">@T("Start each entry on a new line. Use * for wildcards. Ex: google.*")</span>
+    </fieldset>
+
+    <fieldset>
+        @Html.CheckBoxFor(m => m.EnableRefererBotDetector)
+        <label for="@Html.FieldIdFor(m => m.EnableRefererBotDetector)" class="forcheckbox">@T("Enable Referer Bot Detector")</label>
+        <span class="hint">@T("Bot detector will automaticaly populate blacklists if this option enabled.")</span>
+        <span class="hint">@T("IP recognized as bot's if it sends more then 2 requests with different non whitelisted refereres last 2 minutes.")</span>
+    </fieldset>
+    <fieldset>
+        @Html.CheckBoxFor(m => m.EnableRequestLogging)
+        <label for="@Html.FieldIdFor(m => m.EnableRequestLogging)" class="forcheckbox">@T("Enable Request logging")</label>
+        <span class="hint">@T("Log will be written to /App_Data/blacklists/requestLog-yyyyMMdd.csv")</span>
+    </fieldset>
+
+    <button class="primaryAction" type="submit" style="margin-top: 1em;">@T("Save")</button>
+}
