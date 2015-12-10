@@ -13,4 +13,16 @@ Orchard CMS module to block incoming request by IP or by referer. Can be helpful
 IP recognized as bot's if it sends more then 2 requests with different non whitelisted refereres last 2 minutes.
 
 
+## Add ip/referer to black list programmatically
+
+Use `IBlackListsService.Ban(string ip, IEnumerable<string> referers, string banReason);` method.
+
+You can also access BlackListsSettings by following code:
+
+```
+var settings = _services.WorkContext.CurrentSite.As<BlackListsSettingsPart>();
+settings.EnableRequestLogging = model.EnableRequestLogging;
+            
+_signals.Trigger(BlackListsSettings.CacheKey);  
+```
 

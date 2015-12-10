@@ -22,6 +22,7 @@ namespace EightSphere.BlackLists.Services
       
         void LogRequest(string message = "OK");
         void AddRequestToHistory();
+        void Ban(string ip, IEnumerable<string> referers, string banReason);
     }
 
     public class BlackListsService : IBlackListsService
@@ -29,13 +30,10 @@ namespace EightSphere.BlackLists.Services
         private readonly IOrchardServices _services;
         private readonly ICacheManager _cacheManager;
         private readonly ISignals _signals;
-        private readonly IWorkContextAccessor _workContextAccessor;
-        private const int AnalyticsTimeBox = 10;
         private static readonly object syncRoot = new object();
         private static List<RequestHistoryRecord> _requestHistory = new List<RequestHistoryRecord>(); 
 
         private static readonly string IpListFilesPath = "~/App_Data/blacklists";
-        private const string IpBlackListFile = "ip_bl.txt";
 
         private static List<Regex> _ipBlackList;
         private static List<Regex> _ipWhiteList;
@@ -228,7 +226,7 @@ namespace EightSphere.BlackLists.Services
                         LogRequest("BANNED:" + banReason);
                         lock (syncRoot)
                         {
-                            Ban(banReason, ip, referers);
+                            Ban(ip, referers, banReason);
                         }
                     }
                 }
@@ -236,14 +234,19 @@ namespace EightSphere.BlackLists.Services
             return false;
         }
 
-        private void Ban(string banReason, string ip, IEnumerable<string> referers)
+        public void Ban(string ip, IEnumerable<string> referers, string banReason = "")
         {
+            if (!string.IsNullOrWhiteSpace(banReason))
+            {
+                banReason += $" # {banReason}";
+            }
             var settings = _services.WorkContext.CurrentSite.As<BlackListsSettingsPart>();
             bool settingsChanged = false;
             if (!_ipBlackList.Any(x => x.IsMatch(ip)))
             {
                 _ipBlackList.Add(IpToRegex(ip));
-                settings.IpBlackList = AddLines(settings.IpBlackList, ip + " # " + banReason);
+                
+                settings.IpBlackList = AddLines(settings.IpBlackList, ip + banReason);
                 settingsChanged = true;
             }
 
@@ -257,7 +260,9 @@ namespace EightSphere.BlackLists.Services
                 {
                     _referersBlackList.Add(HostToRegex(refToBan));
                 }
-                settings.RefererBlackList = AddLines(settings.RefererBlackList, refsToBan.Select(x => x + " # " + banReason).ToArray());
+                
+                settings.RefererBlackList = 
+                    AddLines(settings.RefererBlackList, refsToBan.Select(x => x + banReason).ToArray());
                 settingsChanged = true;
             }
             if (settingsChanged)
