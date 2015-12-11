@@ -9,23 +9,25 @@
     <fieldset>
         <label>@T("IP Black List")</label>
         @Html.TextAreaFor(m => m.IpBlackList, new {@class = "text small"})
-        <span class="hint">@T("Start each entry on a new line. Use * for wildcards. Ex: 192.168.1.*")</span>
+        <span class="hint">@T("Start each entry on a new line. Use # for comments.")</span>
+        <span class="hint">@T("Use * for wildcards. Ex: 192.168.1.* ")</span>
     </fieldset>
     <fieldset>
         <label>@T("IP White List")</label>
         @Html.TextAreaFor(m => m.IpWhiteList, new {@class = "text small"})
-        <span class="hint">@T("Start each entry on a new line. Use * for wildcards. Ex: 192.168.1.*")</span>
+        <span class="hint">@T("Start each entry on a new line. Use # for comments.")</span>
+        <span class="hint">@T("Use * for wildcards. Ex: 192.168.1.* ")</span>
     </fieldset>
 
     <fieldset>
         <label>@T("Referer Black List")</label>
         @Html.TextAreaFor(m => m.RefererBlackList, new { @class = "text small" })
-        <span class="hint">@T("Start each entry on a new line. Use * for wildcards. Ex: spam.*")</span>
+        <span class="hint">@T("Start each entry on a new line. Use # for comments. Use * for wildcards. Ex: spam.*")</span>
     </fieldset>
     <fieldset>
         <label>@T("Referer White List")</label>
         @Html.TextAreaFor(m => m.RefererWhiteList, new {@class = "text small"})
-        <span class="hint">@T("Start each entry on a new line. Use * for wildcards. Ex: google.*")</span>
+        <span class="hint">@T("Start each entry on a new line. Use # for comments. Use * for wildcards. Ex: google.*")</span>
     </fieldset>
     
         <fieldset>

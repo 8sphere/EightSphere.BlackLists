@@ -38,7 +38,8 @@ namespace EightSphere.BlackLists.Controllers
                 RefererBlackList = settings.RefererBlackList,
                 RefererWhiteList = settings.RefererWhiteList,
                 EnableRefererBotDetector = settings.EnableRefererBotDetector,
-                EnableRequestLogging = settings.EnableRequestLogging
+                EnableRequestLogging = settings.EnableRequestLogging,
+                AutomaticAddItemToBlacklist = settings.AutomaticAddItemToBlacklist
             };
             
             return View(viewModel);
