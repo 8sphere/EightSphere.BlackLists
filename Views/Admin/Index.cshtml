@@ -27,7 +27,13 @@
         @Html.TextAreaFor(m => m.RefererWhiteList, new {@class = "text small"})
         <span class="hint">@T("Start each entry on a new line. Use * for wildcards. Ex: google.*")</span>
     </fieldset>
-
+    
+        <fieldset>
+            @Html.CheckBoxFor(m => m.AutomaticAddItemToBlacklist)
+            <label for="@Html.FieldIdFor(m => m.AutomaticAddItemToBlacklist)" class="forcheckbox">@T("Automaticaly add items to blacklists")</label>
+            <span class="hint">@T("Adds ip for requests with blacklisted referer.")</span>
+            <span class="hint">@T("Adds referer for requests with blacklisted ip.")</span>
+        </fieldset>
     <fieldset>
         @Html.CheckBoxFor(m => m.EnableRefererBotDetector)
         <label for="@Html.FieldIdFor(m => m.EnableRefererBotDetector)" class="forcheckbox">@T("Enable Referer Bot Detector")</label>

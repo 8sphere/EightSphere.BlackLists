@@ -17,14 +17,15 @@ namespace EightSphere.BlackLists.Models
             IpWhiteList = part.IpWhiteList;
             RefererWhiteList = part.RefererWhiteList;
             RefererBlackList = part.RefererBlackList;
+            AutomaticAddItemToBlacklist = part.AutomaticAddItemToBlacklist;
         }
 
         public bool EnableRequestLogging { get; private set; }
         public bool EnableRefererBotDetector { get; private set; }
+        public bool AutomaticAddItemToBlacklist { get; private set; }
         public string IpBlackList { get; private set; }
         public string IpWhiteList { get; private set; }
         public string RefererWhiteList { get; private set; }
-        public string RefererBlackList { get; private set; }
-        
+        public string RefererBlackList { get; private set; }        
     }
 }

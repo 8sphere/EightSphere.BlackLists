@@ -22,7 +22,7 @@ namespace EightSphere.BlackLists.Services
       
         void LogRequest(string message = "OK");
         void AddRequestToHistory();
-        void Ban(string ip, IEnumerable<string> referers, string banReason);
+        void Ban(string ip = "", IEnumerable<string> referers = null, string banReason = "");
     }
 
     public class BlackListsService : IBlackListsService
@@ -182,88 +182,113 @@ namespace EightSphere.BlackLists.Services
                 RawUrl = HttpContext.Current.Request.RawUrl
             });
         }
-                           
+
         public bool IsRequrestBlacklisted()
         {
             var ip = GetIp();
             var referer = GetReferer();
             var rawUrl = HttpContext.Current.Request;
+            // check ip
             if (_ipBlackList.Any(x => x.IsMatch(ip)))
             {
                 LogRequest("BLOCKED BY IP " + ip);
+                if (!string.IsNullOrWhiteSpace(referer) && BlackListsSettings.AutomaticAddItemToBlacklist)
+                {
+                    Ban(referers: new[] {referer}, banReason: $"Blocked by ip {ip}");
+                }
                 return true;
             }
-            
+
+            // skip referer check if it is empty
+            if (string.IsNullOrWhiteSpace(referer))
+            {
+                return false;
+            }
+
+            // check referer
             if (_referersBlackList.Any(x => x.IsMatch(referer)))
             {
                 LogRequest("BLOCKED BY Referer " + referer);
-                return true;
-            }            
-           
-            if (!string.IsNullOrWhiteSpace(referer))
-            {
-                var thisIpLog = _requestHistory.Where(x => x.Ip == ip && !string.IsNullOrWhiteSpace(x.Referer)).ToList();
-                // check if this ip has whitelisted referers in past
-                var pastRef = thisIpLog.FirstOrDefault(x => _referersWhiteList.Any(m => m.IsMatch(x.Referer)));
-                if (pastRef != null)
+                if (BlackListsSettings.AutomaticAddItemToBlacklist)
                 {
-                    //Do not block guest
-                    LogRequest("OK: has whitelisted refs in the past " + pastRef.Referer);
-                    return false;
+                    Ban(ip: ip, banReason: $"Blocked by referer {referer}");
                 }
-
-                if (BlackListsSettings.EnableRefererBotDetector)
+                return true;
+            }
+            if (BlackListsSettings.EnableRefererBotDetector)
+            {
+                var botFound = DetectRefererBot(ip);
+                if (botFound)
                 {
-                    //try to detect multi referer bot (one ip many referers)
-                    var referers =
-                        thisIpLog.Where(x => x.Date > DateTime.UtcNow.AddMinutes(-2))
-                            .Select(x => x.Referer)
-                            .Distinct()
-                            .ToList();                    
-                    if (referers.Count > 2)
-                    {
-                        var banReason = "Referer bot: " + string.Join(", ", referers);
-                        LogRequest("BANNED:" + banReason);
-                        lock (syncRoot)
-                        {
-                            Ban(ip, referers, banReason);
-                        }
-                    }
+                    return true;
                 }
             }
             return false;
+
         }
 
-        public void Ban(string ip, IEnumerable<string> referers, string banReason = "")
+        private bool DetectRefererBot(string ip)
+        {
+            var thisIpLog = _requestHistory.Where(x => x.Ip == ip && !string.IsNullOrWhiteSpace(x.Referer)).ToList();
+            // check if this ip has whitelisted referers in history
+            var pastRef = thisIpLog.FirstOrDefault(x => _referersWhiteList.Any(m => m.IsMatch(x.Referer)));
+            if (pastRef != null)
+            {
+                //Do not block guest
+                LogRequest("OK: has whitelisted refs in the past " + pastRef.Referer);
+                return false;
+            }
+
+            //try to detect multi referer bot (one ip many referers)
+            var referers =
+                thisIpLog.Where(x => x.Date > DateTime.UtcNow.AddMinutes(-2))
+                    .Select(x => x.Referer)
+                    .Distinct()
+                    .ToList();
+            if (referers.Count > 1)
+            {
+                var banReason = "Referer bot: " + string.Join(", ", referers);
+                LogRequest("BANNED:" + banReason);
+                lock (syncRoot)
+                {
+                    Ban(ip, referers, banReason);
+                }
+            }
+
+            return true;
+        }
+
+        public void Ban(string ip = "", IEnumerable<string> referers = null, string banReason = "")
         {
             if (!string.IsNullOrWhiteSpace(banReason))
             {
-                banReason += $" # {banReason}";
+                banReason = $" # {banReason}";
             }
             var settings = _services.WorkContext.CurrentSite.As<BlackListsSettingsPart>();
             bool settingsChanged = false;
-            if (!_ipBlackList.Any(x => x.IsMatch(ip)))
+            if (!string.IsNullOrWhiteSpace(ip) && !_ipBlackList.Any(x => x.IsMatch(ip)) && !_ipWhiteList.Any(x => x.IsMatch(ip)))
             {
-                _ipBlackList.Add(IpToRegex(ip));
-                
+                _ipBlackList.Add(IpToRegex(ip));                
                 settings.IpBlackList = AddLines(settings.IpBlackList, ip + banReason);
                 settingsChanged = true;
             }
 
-            var refsToBan = referers.Where(referer => 
-                !_referersBlackList.Any(x => x.IsMatch(referer)) && 
-                !_ipWhiteList.Any(x => x.IsMatch(referer))
-            ).ToList();
-            if (refsToBan.Any())
+            if (referers != null)
             {
-                foreach (var refToBan in refsToBan)
+                var refsToBan = referers.Where(referer =>
+                    !_referersBlackList.Any(x => x.IsMatch(referer)) &&
+                    !_ipWhiteList.Any(x => x.IsMatch(referer))
+                    ).ToList();
+                if (refsToBan.Any())
                 {
-                    _referersBlackList.Add(HostToRegex(refToBan));
+                    foreach (var refToBan in refsToBan)
+                    {
+                        _referersBlackList.Add(HostToRegex(refToBan));
+                    }
+
+                    settings.RefererBlackList = AddLines(settings.RefererBlackList, refsToBan.Select(x => x + banReason).ToArray());
+                    settingsChanged = true;
                 }
-                
-                settings.RefererBlackList = 
-                    AddLines(settings.RefererBlackList, refsToBan.Select(x => x + banReason).ToArray());
-                settingsChanged = true;
             }
             if (settingsChanged)
             {

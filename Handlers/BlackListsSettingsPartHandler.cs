@@ -8,8 +8,6 @@ namespace EightSphere.BlackLists.Handlers
 {
     public class BlackListsSettingsPartHandler : ContentHandler
     {
-
-
         public BlackListsSettingsPartHandler()
         {
 

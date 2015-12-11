@@ -56,6 +56,7 @@ namespace EightSphere.BlackLists.Controllers
 
             settings.EnableRefererBotDetector = model.EnableRefererBotDetector;
             settings.EnableRequestLogging = model.EnableRequestLogging;
+            settings.AutomaticAddItemToBlacklist = model.AutomaticAddItemToBlacklist;
             _signals.Trigger(BlackListsSettings.CacheKey);            
             return RedirectToAction("Index");
         }

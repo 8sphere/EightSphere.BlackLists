@@ -8,5 +8,6 @@ namespace EightSphere.BlackLists.ViewModel
         public string RefererWhiteList { get; set; }
         public bool EnableRefererBotDetector { get; set; }
         public bool EnableRequestLogging { get; set; }
+        public bool AutomaticAddItemToBlacklist { get; set; }
     }
 }

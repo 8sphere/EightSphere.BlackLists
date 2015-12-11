@@ -40,5 +40,11 @@ namespace EightSphere.BlackLists.Models
             get { return this.Retrieve(x => x.EnableRequestLogging); }
             set { this.Store(x => x.EnableRequestLogging, value); }
         }
+
+        public bool AutomaticAddItemToBlacklist
+        {
+            get { return this.Retrieve(x => x.AutomaticAddItemToBlacklist); }
+            set { this.Store(x => x.AutomaticAddItemToBlacklist, value); }
+        }
     }    
 }
