@@ -46,5 +46,17 @@ namespace EightSphere.BlackLists.Models
             get { return this.Retrieve(x => x.AutomaticAddItemToBlacklist); }
             set { this.Store(x => x.AutomaticAddItemToBlacklist, value); }
         }
+
+        public int BotDetectorDistinctReferersCount
+        {
+            get { return this.Retrieve(x => x.BotDetectorDistinctReferersCount); }
+            set { this.Store(x => x.BotDetectorDistinctReferersCount, value); }
+        }
+
+        public int BotDetectorSessionLenghtInMinutes
+        {
+            get { return this.Retrieve(x => x.BotDetectorSessionLenghtInMinutes); }
+            set { this.Store(x => x.BotDetectorSessionLenghtInMinutes, value); }
+        }
     }    
 }

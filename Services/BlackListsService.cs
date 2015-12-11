@@ -35,7 +35,7 @@ namespace EightSphere.BlackLists.Services
 
         private static readonly string IpListFilesPath = "~/App_Data/blacklists";
 
-        private static List<Regex> _ipBlackList;
+        private static List<Regex> _ipBlackList ;
         private static List<Regex> _ipWhiteList;
         private static List<Regex> _referersBlackList;
         private static List<Regex> _referersWhiteList;
@@ -71,7 +71,7 @@ namespace EightSphere.BlackLists.Services
         }
 
         public void ReloadLists(BlackListsSettings settings)
-        {
+        {            
             _ipBlackList = LoadList(settings.IpBlackList).Select(x => IpToRegex(x)).ToList();
             _ipWhiteList = LoadList(settings.IpWhiteList).Select(x => IpToRegex(x)).ToList();
             _referersBlackList = LoadList(settings.RefererBlackList).Select(x => HostToRegex(x)).ToList();
@@ -111,6 +111,7 @@ namespace EightSphere.BlackLists.Services
 
         public string GetIp()
         {
+            
             var ip = HttpContext.Current.Request.ServerVariables["HTTP_X_FORWARDED_FOR"];
             if (string.IsNullOrEmpty(ip))
             {
@@ -127,7 +128,7 @@ namespace EightSphere.BlackLists.Services
                 return;
             }
             var ip = GetIp();
-            var log = EnsureFile($"requestLog-{DateTime.UtcNow.ToString("yyyyMMdd")}.csv");
+            var log = EnsureFile(string.Format("requestLog-{0}.csv", DateTime.UtcNow.ToString("yyyyMMdd")));
             var logRecord = new[]
             {                
                 DateTime.UtcNow.ToString("yyyy.MM.dd hh:mm:ss"),                
@@ -149,6 +150,10 @@ namespace EightSphere.BlackLists.Services
                
         private static List<string> LoadList(string content)
         {
+            if (string.IsNullOrWhiteSpace(content))
+            {
+                return new List<string>();
+            }
             var lines = content.Split(new string[] { Environment.NewLine }, StringSplitOptions.RemoveEmptyEntries);
             return lines
                 .Select(x => Regex.Replace(x, @"\s+#.*$", ""))
@@ -184,7 +189,7 @@ namespace EightSphere.BlackLists.Services
         }
 
         public bool IsRequrestBlacklisted()
-        {
+        {            
             var ip = GetIp();
             var referer = GetReferer();
             var rawUrl = HttpContext.Current.Request;
@@ -194,7 +199,7 @@ namespace EightSphere.BlackLists.Services
                 LogRequest("BLOCKED BY IP " + ip);
                 if (!string.IsNullOrWhiteSpace(referer) && BlackListsSettings.AutomaticAddItemToBlacklist)
                 {
-                    Ban(referers: new[] {referer}, banReason: $"Blocked by ip {ip}");
+                    Ban(referers: new[] {referer}, banReason: String.Format("Blocked by ip {0}", ip));
                 }
                 return true;
             }
@@ -211,7 +216,7 @@ namespace EightSphere.BlackLists.Services
                 LogRequest("BLOCKED BY Referer " + referer);
                 if (BlackListsSettings.AutomaticAddItemToBlacklist)
                 {
-                    Ban(ip: ip, banReason: $"Blocked by referer {referer}");
+                    Ban(ip: ip, banReason: String.Format("Blocked by referer {0}", referer));
                 }
                 return true;
             }
@@ -239,13 +244,14 @@ namespace EightSphere.BlackLists.Services
                 return false;
             }
 
-            //try to detect multi referer bot (one ip many referers)
+            //try to detect multi referer bot (one ip many referers)            
             var referers =
-                thisIpLog.Where(x => x.Date > DateTime.UtcNow.AddMinutes(-2))
+                thisIpLog
+                    .Where(x => BlackListsSettings.BotDetectorSessionLenghtInMinutes == 0 || x.Date > DateTime.UtcNow.AddMinutes(-1 * BlackListsSettings.BotDetectorSessionLenghtInMinutes))
                     .Select(x => x.Referer)
                     .Distinct()
                     .ToList();
-            if (referers.Count > 1)
+            if (referers.Count >= BlackListsSettings.BotDetectorDistinctReferersCount)
             {
                 var banReason = "Referer bot: " + string.Join(", ", referers);
                 LogRequest("BANNED:" + banReason);
@@ -262,7 +268,7 @@ namespace EightSphere.BlackLists.Services
         {
             if (!string.IsNullOrWhiteSpace(banReason))
             {
-                banReason = $" # {banReason}";
+                banReason = String.Format(" # {0}", banReason);
             }
             var settings = _services.WorkContext.CurrentSite.As<BlackListsSettingsPart>();
             bool settingsChanged = false;
@@ -285,7 +291,6 @@ namespace EightSphere.BlackLists.Services
                     {
                         _referersBlackList.Add(HostToRegex(refToBan));
                     }
-
                     settings.RefererBlackList = AddLines(settings.RefererBlackList, refsToBan.Select(x => x + banReason).ToArray());
                     settingsChanged = true;
                 }

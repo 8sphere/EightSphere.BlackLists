@@ -21,7 +21,7 @@
 
     <fieldset>
         <label>@T("Referer Black List")</label>
-        @Html.TextAreaFor(m => m.RefererBlackList, new { @class = "text small" })
+        @Html.TextAreaFor(m => m.RefererBlackList, new {@class = "text small"})
         <span class="hint">@T("Start each entry on a new line. Use # for comments. Use * for wildcards. Ex: spam.*")</span>
     </fieldset>
     <fieldset>
@@ -29,24 +29,36 @@
         @Html.TextAreaFor(m => m.RefererWhiteList, new {@class = "text small"})
         <span class="hint">@T("Start each entry on a new line. Use # for comments. Use * for wildcards. Ex: google.*")</span>
     </fieldset>
-    
-        <fieldset>
-            @Html.CheckBoxFor(m => m.AutomaticAddItemToBlacklist)
-            <label for="@Html.FieldIdFor(m => m.AutomaticAddItemToBlacklist)" class="forcheckbox">@T("Automaticaly add items to blacklists")</label>
-            <span class="hint">@T("Adds ip for requests with blacklisted referer.")</span>
-            <span class="hint">@T("Adds referer for requests with blacklisted ip.")</span>
-        </fieldset>
+
     <fieldset>
-        @Html.CheckBoxFor(m => m.EnableRefererBotDetector)
-        <label for="@Html.FieldIdFor(m => m.EnableRefererBotDetector)" class="forcheckbox">@T("Enable Referer Bot Detector")</label>
-        <span class="hint">@T("Bot detector will automaticaly populate blacklists if this option enabled.")</span>
-        <span class="hint">@T("IP recognized as bot's if it sends more then 2 requests with different non whitelisted refereres last 2 minutes.")</span>
+        @Html.CheckBoxFor(m => m.AutomaticAddItemToBlacklist)
+        <label for="@Html.FieldIdFor(m => m.AutomaticAddItemToBlacklist)" class="forcheckbox">@T("Automaticaly add items to blacklists")</label>
+        <span class="hint">@T("Adds ip for requests with blacklisted referer.")</span>
+        <span class="hint">@T("Adds referer for requests with blacklisted ip.")</span>
     </fieldset>
     <fieldset>
         @Html.CheckBoxFor(m => m.EnableRequestLogging)
         <label for="@Html.FieldIdFor(m => m.EnableRequestLogging)" class="forcheckbox">@T("Enable Request logging")</label>
         <span class="hint">@T("Log will be written to /App_Data/blacklists/requestLog-yyyyMMdd.csv")</span>
     </fieldset>
+
+    <h2>@T("Referer Bot Detector Settings")</h2>
+    <fieldset>
+        @Html.CheckBoxFor(m => m.EnableRefererBotDetector)
+        <label for="@Html.FieldIdFor(m => m.EnableRefererBotDetector)" class="forcheckbox">@T("Enable Referer Bot Detector")</label>
+        <span class="hint">@T("Bot detector will automaticaly populate blacklists if this option enabled.")</span>
+        <span class="hint">@T("IP recognized as bot's if it sends more then some count requests with different non whitelisted refereres in last session.")</span>
+    </fieldset>
+    <fieldset>
+        <label>@T("Session length in minutes")</label>
+        @Html.TextBoxFor(m => m.BotDetectorSessionLenghtInMinutes)
+        <span class="hint">@T("Set 0 to have unlimited length session")</span>
+    </fieldset>
+    <fieldset>
+        <label>@T("Distinct referers count per session")</label>
+        @Html.TextBoxFor(m => m.BotDetectorDistinctReferersCount)
+    </fieldset>
+
 
     <button class="primaryAction" type="submit" style="margin-top: 1em;">@T("Save")</button>
 }
