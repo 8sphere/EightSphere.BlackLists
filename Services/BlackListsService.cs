@@ -6,6 +6,7 @@ using System.Text;
 using System.Text.RegularExpressions;
 using System.Web;
 using System.Web.Hosting;
+using EightSphere.BlackLists.Extensions;
 using EightSphere.BlackLists.Models;
 using Orchard;
 using Orchard.Caching;
@@ -30,8 +31,9 @@ namespace EightSphere.BlackLists.Services
         private readonly IOrchardServices _services;
         private readonly ICacheManager _cacheManager;
         private readonly ISignals _signals;
-        private static readonly object syncRoot = new object();
+        private static readonly object banSyncRoot = new object();
         private static List<RequestHistoryRecord> _requestHistory = new List<RequestHistoryRecord>(); 
+        private static readonly object logSyncRoot = new object();
 
         private static readonly string IpListFilesPath = "~/App_Data/blacklists";
 
@@ -111,7 +113,6 @@ namespace EightSphere.BlackLists.Services
 
         public string GetIp()
         {
-            
             var ip = HttpContext.Current.Request.ServerVariables["HTTP_X_FORWARDED_FOR"];
             if (string.IsNullOrEmpty(ip))
             {
@@ -141,11 +142,19 @@ namespace EightSphere.BlackLists.Services
                     ? HttpContext.Current.Request.UserAgent.Replace(";", ",")
                     : ""
             };
-
-            File.AppendAllLines(log, new List<string>()
+            lock (logSyncRoot)
             {
-                string.Join(";", logRecord)
-            });
+                try
+                {
+                    File.AppendAllLines(log, new List<string>()
+                    {
+                        string.Join(";", logRecord)
+                    });
+                }
+                catch
+                {
+                }
+            }
         }
                
         private static List<string> LoadList(string content)
@@ -255,7 +264,7 @@ namespace EightSphere.BlackLists.Services
             {
                 var banReason = "Referer bot: " + string.Join(", ", referers);
                 LogRequest("BANNED:" + banReason);
-                lock (syncRoot)
+                lock (banSyncRoot)
                 {
                     Ban(ip, referers, banReason);
                 }

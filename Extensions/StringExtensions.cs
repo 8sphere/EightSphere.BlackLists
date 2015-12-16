@@ -1,6 +1,7 @@
+using System;
 using System.Text.RegularExpressions;
 
-namespace EightSphere.BlackLists.Services
+namespace EightSphere.BlackLists.Extensions
 {
     internal static class StringExtensions
     {

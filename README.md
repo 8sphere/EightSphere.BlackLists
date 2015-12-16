@@ -10,8 +10,7 @@ Orchard CMS module to block incoming request by IP or by referer. Can be helpful
 
 
 ## Referer bot detector
-IP recognized as bot's if it sends more then 2 requests with different non whitelisted refereres last 2 minutes.
-
+IP address will be marked as spam if it sends more than some number of requests with different non-whitelisted referrers during a given session
 
 ## Add ip/referer to black list programmatically
 
