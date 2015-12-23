@@ -41,7 +41,7 @@ namespace EightSphere.BlackLists.Controllers
                 EnableRequestLogging = settings.EnableRequestLogging,
                 AutomaticAddItemToBlacklist = settings.AutomaticAddItemToBlacklist,
                 BotDetectorDistinctReferersCount = settings.BotDetectorDistinctReferersCount,
-                BotDetectorSessionLenghtInMinutes = settings.BotDetectorSessionLenghtInMinutes
+                BotDetectorSessionLengthInSeconds = settings.BotDetectorSessionLengthInSeconds
             };
             
             return View(viewModel);
@@ -61,7 +61,7 @@ namespace EightSphere.BlackLists.Controllers
             settings.EnableRequestLogging = model.EnableRequestLogging;
             settings.AutomaticAddItemToBlacklist = model.AutomaticAddItemToBlacklist;
             settings.BotDetectorDistinctReferersCount = model.BotDetectorDistinctReferersCount;
-            settings.BotDetectorSessionLenghtInMinutes = model.BotDetectorSessionLenghtInMinutes;
+            settings.BotDetectorSessionLengthInSeconds = model.BotDetectorSessionLengthInSeconds;
             _signals.Trigger(BlackListsSettings.CacheKey);            
             return RedirectToAction("Index");
         }

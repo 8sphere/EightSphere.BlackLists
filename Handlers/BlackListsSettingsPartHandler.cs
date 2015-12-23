@@ -38,7 +38,7 @@ namespace EightSphere.BlackLists.Handlers
                 part.AutomaticAddItemToBlacklist = false;
                 part.EnableRequestLogging = false;
                 part.EnableRefererBotDetector = false;
-                part.BotDetectorSessionLenghtInMinutes = 2;
+                part.BotDetectorSessionLengthInSeconds = 180;
                 part.BotDetectorDistinctReferersCount = 3;
             });
         }

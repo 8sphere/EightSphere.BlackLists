@@ -12,6 +12,6 @@ namespace EightSphere.BlackLists.ViewModel
         public bool EnableRequestLogging { get; set; }
         public bool AutomaticAddItemToBlacklist { get; set; }
         public int BotDetectorDistinctReferersCount { get; set; }
-        public int BotDetectorSessionLenghtInMinutes { get; set; }
+        public int BotDetectorSessionLengthInSeconds { get; set; }
     }
 }

@@ -50,9 +50,9 @@
         <span class="hint">@T("IP recognized as bot's if it sends more then some count requests with different non whitelisted refereres in last session.")</span>
     </fieldset>
     <fieldset>
-        <label>@T("Session length in minutes")</label>
-        @Html.TextBoxFor(m => m.BotDetectorSessionLenghtInMinutes)
-        <span class="hint">@T("Set 0 to have unlimited length session. (Recommended: 2)")</span>
+        <label>@T("Session length in seconds")</label>
+        @Html.TextBoxFor(m => m.BotDetectorSessionLengthInSeconds)
+        <span class="hint">@T("Set 0 to have unlimited length session. (Recommended: 180)")</span>
     </fieldset>
     <fieldset>
         <label>@T("Distinct referers count per session = Number of distinct referers to allow during a session. (Recommended: 3)")</label>

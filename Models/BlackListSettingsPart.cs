@@ -53,10 +53,10 @@ namespace EightSphere.BlackLists.Models
             set { this.Store(x => x.BotDetectorDistinctReferersCount, value); }
         }
 
-        public int BotDetectorSessionLenghtInMinutes
+        public int BotDetectorSessionLengthInSeconds
         {
-            get { return this.Retrieve(x => x.BotDetectorSessionLenghtInMinutes); }
-            set { this.Store(x => x.BotDetectorSessionLenghtInMinutes, value); }
+            get { return this.Retrieve(x => x.BotDetectorSessionLengthInSeconds); }
+            set { this.Store(x => x.BotDetectorSessionLengthInSeconds, value); }
         }
     }    
 }

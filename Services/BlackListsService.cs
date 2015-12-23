@@ -256,7 +256,7 @@ namespace EightSphere.BlackLists.Services
             //try to detect multi referer bot (one ip many referers)            
             var referers =
                 thisIpLog
-                    .Where(x => BlackListsSettings.BotDetectorSessionLenghtInMinutes == 0 || x.Date > DateTime.UtcNow.AddMinutes(-1 * BlackListsSettings.BotDetectorSessionLenghtInMinutes))
+                    .Where(x => BlackListsSettings.BotDetectorSessionLengthInSeconds == 0 || x.Date > DateTime.UtcNow.AddSeconds(-1 * BlackListsSettings.BotDetectorSessionLengthInSeconds))
                     .Select(x => x.Referer)
                     .Distinct()
                     .ToList();

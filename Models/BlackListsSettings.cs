@@ -21,7 +21,7 @@ namespace EightSphere.BlackLists.Models
             RefererBlackList = part.RefererBlackList;
             AutomaticAddItemToBlacklist = part.AutomaticAddItemToBlacklist;
             BotDetectorDistinctReferersCount = part.BotDetectorDistinctReferersCount;
-            BotDetectorSessionLenghtInMinutes = part.BotDetectorSessionLenghtInMinutes;
+            BotDetectorSessionLengthInSeconds = part.BotDetectorSessionLengthInSeconds;
         }
 
         public bool EnableRequestLogging { get; private set; }
@@ -32,6 +32,6 @@ namespace EightSphere.BlackLists.Models
         public string RefererWhiteList { get; private set; }
         public string RefererBlackList { get; private set; }
         public int BotDetectorDistinctReferersCount { get; private set; }
-        public int BotDetectorSessionLenghtInMinutes { get; private set; }
+        public int BotDetectorSessionLengthInSeconds { get; private set; }
     }
 }
