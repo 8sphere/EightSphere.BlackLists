@@ -106,7 +106,12 @@ namespace EightSphere.BlackLists.Services
 
         public string GetReferer()
         {
-            var referer =  HttpContext.Current.Request.UrlReferrer != null ? HttpContext.Current.Request.UrlReferrer.Host : "";
+            return HttpContext.Current.Request.UrlReferrer != null ? HttpContext.Current.Request.UrlReferrer.Host : "";
+        }
+
+        public string GetRefererHost()
+        {
+            var referer = GetReferer();
             referer = Regex.Replace(referer, @"^www\.", "");
             return referer.ToLower();
         }
@@ -135,9 +140,10 @@ namespace EightSphere.BlackLists.Services
                 DateTime.UtcNow.ToString("yyyy.MM.dd hh:mm:ss"),                
                 ip,
                 HttpContext.Current.Request.UserHostAddress,
-                GetReferer(),
+                GetRefererHost(),
                 HttpContext.Current.Request.RawUrl,
                 message,
+                GetReferer(),
                 HttpContext.Current.Request.UserAgent != null
                     ? HttpContext.Current.Request.UserAgent.Replace(";", ",")
                     : ""
@@ -188,7 +194,7 @@ namespace EightSphere.BlackLists.Services
         public void AddRequestToHistory()
         {
             var ip = GetIp();
-            var referer = GetReferer();
+            var referer = GetRefererHost();
             _requestHistory.Add(new RequestHistoryRecord
             {
                 Ip = ip,
@@ -200,7 +206,7 @@ namespace EightSphere.BlackLists.Services
         public bool IsRequrestBlacklisted()
         {            
             var ip = GetIp();
-            var referer = GetReferer();
+            var referer = GetRefererHost();
             var rawUrl = HttpContext.Current.Request;
             // check ip
             if (_ipBlackList.Any(x => x.IsMatch(ip)))
@@ -266,11 +272,12 @@ namespace EightSphere.BlackLists.Services
                 LogRequest("BANNED:" + banReason);
                 lock (banSyncRoot)
                 {
-                    Ban(ip, referers, banReason);
+                    Ban(ip, referers, banReason);                    
                 }
+                return true;
             }
 
-            return true;
+            return false;
         }
 
         public void Ban(string ip = "", IEnumerable<string> referers = null, string banReason = "")
@@ -332,7 +339,7 @@ namespace EightSphere.BlackLists.Services
                 LogRequest("WL by ip " + ip);
                 return true;
             }
-            var referer = GetReferer();
+            var referer = GetRefererHost();
             if (_referersWhiteList.Any(x => x.IsMatch(referer)))
             {
                 LogRequest("WL by referer " + referer);
