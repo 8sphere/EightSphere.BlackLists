@@ -1,6 +1,8 @@
 # EightSphere.BlackLists
 Orchard CMS module to block incoming request by IP or by referer. Can be helpful to prevent referer spam. 
 
+Developed and maintained by <a href="http://www.8sph.com">8th Sphere</a>
+
 ## Key features
 * IP black/white lists.
 * Wildcards support in ip black/white lists. E.g. 192.168.1.* 
