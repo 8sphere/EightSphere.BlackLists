@@ -2,8 +2,8 @@
 AntiForgery: enabled
 Author: 8th Sphere Inc
 Website: https://github.com/8sphere/EightSphere.BlackLists
-Version: 1.0.6.0
-OrchardVersion: 1.9.2
+Version: 1.0.7.0
+OrchardVersion: 1.10
 Description: Allows to block incoming request by IP or by referer. Can be helpful to prevent referer spam. 
 Features:
     EightSphere.BlackLists:
